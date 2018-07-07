@@ -248,7 +248,7 @@ handlers.BeginDungeon = function (args) {
     var GrantItemRequest = {
         PlayFabId : currentPlayerId,
         CatalogVersion : "main",
-        ItemIds : [ FirstDungeon ],
+        ItemIds : [ "FirstDungeon" ],
     }
 
     server.GrantItemsToUser(GrantItemRequest);
