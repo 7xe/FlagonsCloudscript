@@ -251,7 +251,18 @@ handlers.BeginDungeon = function (args) {
         ItemIds : [ "FirstDungeon" ],
     }
 
-    server.GrantItemsToUser(GrantItemRequest);
+    var grantItemResult = server.GrantItemsToUser(GrantItemRequest);
+    var currentTime = server.GetTime();
+
+    var instanceId = grantItemResult.data.ItemGrantResults[0].ItemInstanceId;
+    
+    server.UpdateUserInventoryItemCustomData({
+        PlayFabId: currentPlayerId,
+        ItemInstanceId: instanceId,
+        Data: {
+            "EndTime": currentTime
+        }
+    });
 }
 
 handlers.CompleteDungeon = function (args) {
