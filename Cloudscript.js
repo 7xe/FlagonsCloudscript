@@ -244,6 +244,42 @@ handlers.unlockHighSkillContent = function (args, context) {
 };
 
 handlers.BeginDungeon = function (args) {
+
+    var GrantItemRequest = {
+        PlayFabId : currentPlayerId,
+        CatalogVersion : "main",
+        ItemIds : [ FirstDungeon ],
+    }
+
+    server.GrantItemsToUser(GrantItemRequest);
+}
+
+handlers.CompleteDungeon = function (args) {
+
+    var GrantItemRequest = {
+        PlayFabId : currentPlayerId,
+        CatalogVersion : "main",
+        ItemIds : [ "FirstDungeonDummyKey" ],
+    }
+
+    server.GrantItemsToUser(GrantItemRequest);
+
+    var UnlockContainerRequest = {
+        PlayFabId : currentPlayerId,
+        CatalogVersion : "main",
+        ContainerItemId : "FirstDungeon",
+    }
+
+    server.UnlockContainerItem(UnlockContainerRequest);
+}
+
+// var UnlockContainerRequest = {
+//     PlayFabId : currentPlayerId,
+//     ContainerItemId : "FirstDungeon",
+// }
+
+
+handlers.GetMonies = function (args) {
     var GetUserInventoryRequest = {
         "PlayFabId" : currentPlayerId
     };
@@ -257,7 +293,7 @@ handlers.BeginDungeon = function (args) {
 
 function AddVC(vcBalances, code, amount)
 {
-    if(vcBalances != null && vcBalances.hasOwnProperty(code)){
+    if(vcBalances !== null && vcBalances.hasOwnProperty(code)){
         vcBalances[code] += amount;
     }
 
@@ -266,5 +302,55 @@ function AddVC(vcBalances, code, amount)
         "VirtualCurrency" : code,
         "Amount" : amount
     };
+
+    
     var AddUserVirtualCurrencyResult = server.AddUserVirtualCurrency(AddUserVirtualCurrencyRequest);
 }
+
+//james brain dump
+
+// const vc = (vcBalances, virtualCurrency, amount) => {
+//     if (vcBalances && vcBalances[virtualCurrency]) {
+//         vcBalances[virtualCurrency] += amount;
+//     }
+
+//     const addUserVirtualCurrencyRequest = {
+//         playFabId: currentPlayerId,
+//         virtualCurrency,
+//         amount,
+//         apple: () => {
+//             console.log('I\'m a function');
+//         }
+//     };
+
+//     const AddUserVirtualCurrencyResult = server.AddUserVirtualCurrency(AddUserVirtualCurrencyRequest);
+// };
+
+// const vc = (data) => {
+//     const { virtualCurrency, amount } = data;
+//     const addUserVirtualCurrencyRequest = {
+//         playFabId: currentPlayerId,
+//         ...data
+//     };
+
+//     console.log(`Virtual currency ${virtual currency}, amount: ${amount}`);
+//     server.AddUserVirtualCurrency({
+//         playFabId: currentPlayerId,
+//         ...data
+//     });
+// };
+
+// const closure = (playerName) => {
+//     return () => {
+//         console.log(playerName);
+//     };
+// };
+
+// const sammyYeller = closure('Sammy');
+// const yellerList = [];
+
+// for (let i = 0; i < 1000; i++) {
+//     yellerList.push(sammyYeller);
+// }
+
+// yellerList.forEach(yeller => yeller());
