@@ -255,14 +255,21 @@ handlers.BeginDungeon = function (args) {
     var currentTime = server.GetTime();
 
     var instanceId = grantItemResult.data.ItemGrantResults[0].ItemInstanceId;
-    
+    log.debug(instanceId);
+    log.debug(grantItemResult.data);
+    log.debug(grantItemResult.data.ItemGrantResults[0]);
+    log.debug(currentTime);
+
     server.UpdateUserInventoryItemCustomData({
         PlayFabId: currentPlayerId,
         ItemInstanceId: instanceId,
         Data: {
-            "EndTime": currentTime
+            "EndTime": currentTime,
+            "Test": 1,
         }
     });
+
+    return grantItemResult;
 }
 
 handlers.CompleteDungeon = function (args) {
