@@ -245,29 +245,23 @@ handlers.unlockHighSkillContent = function (args, context) {
 
 handlers.BeginDungeon = function (args) {
 
+    var currentTime = Date.now();
+
     var GrantItemRequest = {
         PlayFabId : currentPlayerId,
         CatalogVersion : "main",
         ItemIds : [ "FirstDungeon" ],
+        Data : {
+            EndTime: currentTime,
+        }
     }
 
     var grantItemResult = server.GrantItemsToUser(GrantItemRequest);
-    var currentTime = server.GetTime();
+    
+    //var lastMoveTime = Date.parse(lastMoveTimestampSetting.Value);
 
-    var instanceId = grantItemResult.data.ItemGrantResults[0].ItemInstanceId;
-    log.debug(instanceId);
-    log.debug(grantItemResult.data);
-    log.debug(grantItemResult.data.ItemGrantResults[0]);
     log.debug(currentTime);
 
-    server.UpdateUserInventoryItemCustomData({
-        PlayFabId: currentPlayerId,
-        ItemInstanceId: instanceId,
-        Data: {
-            "EndTime": currentTime,
-            "Test": 1,
-        }
-    });
 
     return grantItemResult;
 }
