@@ -252,7 +252,7 @@ handlers.BeginDungeon = function (args) {
         CatalogVersion : "main",
         ItemIds : [ "FirstDungeon" ],
         Data : {
-            EndTime: currentTime,
+            "EndTime": currentTime,
         }
     }
 
@@ -267,6 +267,8 @@ handlers.BeginDungeon = function (args) {
 }
 
 handlers.CompleteDungeon = function (args) {
+
+    var currentTime = Date.now();
 
     var GrantItemRequest = {
         PlayFabId : currentPlayerId,
