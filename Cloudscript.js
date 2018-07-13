@@ -261,12 +261,11 @@ handlers.BeginDungeon = function (args) {
             "Annotation": "pls work",
             "Data": {
               "Equipped": "True",
-              "Slot": "Head",
-              "EndTime": currentTime
+              "Slot": "Head"
             }
           }
         ]
-    }
+    };
     
 
     var grantItemResult = server.GrantItemsToUser(GrantItemRequest);
