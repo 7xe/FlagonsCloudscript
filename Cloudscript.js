@@ -268,7 +268,7 @@ handlers.BeginDungeon = function (args) {
     };
     
 
-    var grantItemResult = server.GrantItemsToUser(GrantItemRequest);
+    var grantItemResult = server.GrantItemsToUsers(GrantItemRequest);
     
     //var lastMoveTime = Date.parse(lastMoveTimestampSetting.Value);
 
