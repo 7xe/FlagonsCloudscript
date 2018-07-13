@@ -247,16 +247,26 @@ handlers.BeginDungeon = function (args) {
 
     var currentTime = Date.now();
 
-    var GrantItemRequest = [
-        {
-            PlayFabId: currentPlayerId,
-            ItemId: "FirstDungeon",
-            Data: {
-                "EndTime": currentTime,
-                "Test": 1,
+    var GrantItemRequest = {
+        "CatalogVersion": "main",
+        "ItemGrants": [
+          {
+            "PlayFabId": currentPlayerId,
+            "ItemId": "One",
+            "Annotation": "why this aint working"
+          },
+          {
+            "PlayFabId": currentPlayerId,
+            "ItemId": "FirstDungeon",
+            "Annotation": "pls work",
+            "Data": {
+              "Equipped": "True",
+              "Slot": "Head",
+              "EndTime": currentTime
             }
-        }
-    ]
+          }
+        ]
+    }
     
 
     var grantItemResult = server.GrantItemsToUser(GrantItemRequest);
