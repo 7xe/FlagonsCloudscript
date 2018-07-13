@@ -260,8 +260,7 @@ handlers.BeginDungeon = function (args) {
             "ItemId": "FirstDungeon",
             "Annotation": "pls work",
             "Data": {
-              "Equipped": "True",
-              "Slot": "Head"
+              "EndTime": currentTime,
             }
           }
         ]
