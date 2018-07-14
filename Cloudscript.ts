@@ -73,11 +73,11 @@ handlers.CompleteDungeon = function (args) {
     if(dungeon !== null && rootItem !== null){
 
         let dungeonData = JSON.parse(rootItem.CustomData);
-        const endTime: number = Date.parse(dungeon.CustomData["StartTime"]) + Number(dungeonData["Duration"]);
+        const endTime: number = Number(dungeon.CustomData["StartTime"]) + Number(dungeonData["Duration"]);
 
         log.info("Current time = " + currentTime);
         log.info("End time = " + endTime);
-        log.info("Start time = " + Date.parse(dungeon.CustomData["StartTime"]));
+        log.info("Start time = " + dungeon.CustomData["StartTime"]);
         log.info("Duration = " + dungeonData["Duration"]);
 
         if(currentTime > endTime){
