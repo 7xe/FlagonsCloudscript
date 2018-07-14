@@ -12,18 +12,18 @@ handlers.BeginDungeon = function (args) {
     }
     var GrantItemRequest = {
         CatalogVersion: "main",
-        ItemGrants: [
-            {
-                PlayFabId: currentPlayerId,
-                ItemId: itemId,
-                Data: {
-                    "StartTime": currentTime.toString()
-                }
-            },
-        ]
+        PlayFabId: currentPlayerId,
+        ItemIds: [itemId]
     };
-    var grantItemResult = server.GrantItemsToUsers(GrantItemRequest);
-    return grantItemResult.ItemGrantResults;
+    var grantItemResult = server.GrantItemsToUser(GrantItemRequest);
+    var modifyDataRequest = {
+        PlayFabId: currentPlayerId,
+        ItemInstanceId: grantItemResult.ItemGrantResults[0].ItemInstanceId,
+        Data: {
+            "StartTime": currentTime.toString()
+        }
+    };
+    return grantItemResult.ItemGrantResults[0];
 };
 handlers.CompleteDungeon = function (args) {
     var currentTime = Date.now();
@@ -46,6 +46,8 @@ handlers.CompleteDungeon = function (args) {
     });
     if (dungeon !== null) {
         var endTime = Date.parse(dungeon.CustomData["StartTime"]) + Date.parse(dungeon.CustomData["Duration"]);
+        log.info("Current time = " + currentTime);
+        log.info("End time = " + endTime);
         if (currentTime > endTime) {
             var GrantItemRequest = {
                 PlayFabId: currentPlayerId,
@@ -60,6 +62,12 @@ handlers.CompleteDungeon = function (args) {
             };
             server.UnlockContainerItem(UnlockContainerRequest);
         }
+        else {
+            log.debug("Not enough time has passed to complete dungeon");
+        }
+    }
+    else {
+        log.debug("Couldnt find dungeon in user inventory");
     }
 };
 handlers.GetMonies = function (args) {

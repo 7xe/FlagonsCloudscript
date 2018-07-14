@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------------------//
 //Variables
 
-let GOLD_CODE :string = "GP";
+const GOLD_CODE :string = "GP";
 
 handlers.BeginDungeon = function (args) {
 
@@ -16,22 +16,23 @@ handlers.BeginDungeon = function (args) {
         log.info("We defaulted to FirstDungeon");
     }
 
-    let GrantItemRequest: PlayFabServerModels.GrantItemsToUsersRequest = {
+    let GrantItemRequest: PlayFabServerModels.GrantItemsToUserRequest = {
         CatalogVersion: "main",
-        ItemGrants:[
-            {
-              PlayFabId: currentPlayerId,
-              ItemId: itemId,
-              Data: {
-                "StartTime": currentTime.toString(),
-              }
-            },
-        ]
-    };
+        PlayFabId: currentPlayerId,
+        ItemIds: [itemId]
+    }
     
-    let grantItemResult = server.GrantItemsToUsers(GrantItemRequest);
+    let grantItemResult = server.GrantItemsToUser(GrantItemRequest);
 
-    return grantItemResult.ItemGrantResults;
+    let modifyDataRequest: PlayFabServerModels.UpdateUserInventoryItemDataRequest = {
+        PlayFabId: currentPlayerId,
+        ItemInstanceId: grantItemResult.ItemGrantResults[0].ItemInstanceId,
+        Data: {
+            "StartTime": currentTime.toString(),
+        }
+    }
+
+    return grantItemResult.ItemGrantResults[0];
 }
 
 handlers.CompleteDungeon = function (args) {
@@ -63,6 +64,9 @@ handlers.CompleteDungeon = function (args) {
 
         const endTime: number = Date.parse(dungeon.CustomData["StartTime"]) + Date.parse(dungeon.CustomData["Duration"]);
 
+        log.info("Current time = " + currentTime);
+        log.info("End time = " + endTime);
+
         if(currentTime > endTime){
             const GrantItemRequest = {
                 PlayFabId : currentPlayerId,
@@ -79,7 +83,11 @@ handlers.CompleteDungeon = function (args) {
             }
         
             server.UnlockContainerItem(UnlockContainerRequest);
+        } else {
+            log.debug("Not enough time has passed to complete dungeon");
         }
+    } else {
+        log.debug("Couldnt find dungeon in user inventory")
     }
 }
 
