@@ -14,7 +14,7 @@ handlers.BeginDungeon = function (args) {
         ]
     };
     var grantItemResult = server.GrantItemsToUsers(GrantItemRequest);
-    return grantItemResult;
+    return grantItemResult.ItemGrantResults;
 };
 handlers.CompleteDungeon = function (args) {
     var currentTime = Date.now();

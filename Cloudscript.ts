@@ -24,7 +24,7 @@ handlers.BeginDungeon = function (args) {
     
     //var lastMoveTime = Date.parse(lastMoveTimestampSetting.Value);
 
-    return grantItemResult;
+    return grantItemResult.ItemGrantResults;
 }
 
 handlers.CompleteDungeon = function (args) {
