@@ -12,56 +12,71 @@ handlers.BeginDungeon = function (args) {
         ItemGrants:[
             {
               PlayFabId: currentPlayerId,
-              ItemId: "One",
-              Annotation: "why this aint working"
-            },
-            {
-              PlayFabId: currentPlayerId,
               ItemId: "FirstDungeon",
-              Annotation: "pls work",
               Data: {
-                "EndTime": currentTime.toString(),
+                "StartTime": currentTime.toString(),
               }
-            }
+            },
         ]
     };
     
-
     let grantItemResult = server.GrantItemsToUsers(GrantItemRequest);
     
     //var lastMoveTime = Date.parse(lastMoveTimestampSetting.Value);
 
-    log.debug(currentTime.toString());
-    
     return grantItemResult;
 }
 
 handlers.CompleteDungeon = function (args) {
 
-    var currentTime = Date.now();
+    let currentTime = Date.now();
+    let inventory = server.GetUserInventory({PlayFabId: currentPlayerId});
+    
+    let itemId: string;
 
-    var GrantItemRequest = {
-        PlayFabId : currentPlayerId,
-        CatalogVersion : "main",
-        ItemIds : [ "FirstDungeonDummyKey" ],
+    if(args && args.hasOwnProperty("ItemId")){
+        itemId = args["ItemId"];
+        log.info("We used the argument passed to us " + itemId);
+    } else {
+        itemId = "FirstDungeon";
+        log.info("We defaulted to FirstDungeon");
+    }
+    
+    let dungeon: PlayFabServerModels.ItemInstance = null;
+
+    //find the first dungeon in inventory
+    inventory.Inventory.forEach(function(item, index, array){
+        if(item.ItemId == itemId){
+            dungeon = item;
+        }
+    });
+
+    if(dungeon !== null){
+        let GrantItemRequest = {
+            PlayFabId : currentPlayerId,
+            CatalogVersion : "main",
+            ItemIds : [ "FirstDungeonDummyKey" ],
+        }
+    
+        server.GrantItemsToUser(GrantItemRequest);
+    
+        let UnlockContainerRequest = {
+            PlayFabId : currentPlayerId,
+            CatalogVersion : "main",
+            ContainerItemId : dungeon.ItemId,
+        }
+    
+        server.UnlockContainerItem(UnlockContainerRequest);
     }
 
-    server.GrantItemsToUser(GrantItemRequest);
 
-    var UnlockContainerRequest = {
-        PlayFabId : currentPlayerId,
-        CatalogVersion : "main",
-        ContainerItemId : "FirstDungeon",
-    }
-
-    server.UnlockContainerItem(UnlockContainerRequest);
 }
 
 handlers.GetMonies = function (args) {
-    var GetUserInventoryRequest = {
+    let GetUserInventoryRequest = {
         "PlayFabId" : currentPlayerId
     };
-    var GetUserInventoryResult = server.GetUserInventory(GetUserInventoryRequest);
+    let GetUserInventoryResult = server.GetUserInventory(GetUserInventoryRequest);
 
     var userInventory = GetUserInventoryResult.Inventory;
     var userVCBalances = GetUserInventoryResult.VirtualCurrency;
