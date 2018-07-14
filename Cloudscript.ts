@@ -1,6 +1,5 @@
 //--------------------------------------------------------------------------------------------------//
 //Variables
-
 const GOLD_CODE :string = "GP";
 
 handlers.BeginDungeon = function (args) {
@@ -40,7 +39,8 @@ handlers.BeginDungeon = function (args) {
 handlers.CompleteDungeon = function (args) {
 
     let currentTime = Date.now();
-    let inventory = server.GetUserInventory({PlayFabId: currentPlayerId});
+    let catalog = server.GetCatalogItems({CatalogVersion: "main"}).Catalog;
+    let inventory = server.GetUserInventory({PlayFabId: currentPlayerId}).Inventory;
     
     let itemId: string;
 
@@ -53,21 +53,32 @@ handlers.CompleteDungeon = function (args) {
     }
     
     let dungeon: PlayFabServerModels.ItemInstance = null;
+    let rootItem: PlayFabServerModels.CatalogItem = null;
 
-    //find the first dungeon in inventory
-    inventory.Inventory.forEach(function(item, index, array){
+    inventory.forEach(function(item, index, array){
         if(item.ItemId == itemId){
             dungeon = item;
             return;
         }
     });
 
-    if(dungeon !== null){
+    catalog.forEach(function(item, index, array){
+        if(item.ItemId == itemId){
+            rootItem = item;
+            return;
+        }
+    });
+    
 
-        const endTime: number = Date.parse(dungeon.CustomData["StartTime"]) + Date.parse(dungeon.CustomData["Duration"]);
+    if(dungeon !== null && rootItem !== null){
+
+        let dungeonData = JSON.parse(rootItem.CustomData);
+        const endTime: number = Date.parse(dungeon.CustomData["StartTime"]) + Number(dungeonData["Duration"]);
 
         log.info("Current time = " + currentTime);
         log.info("End time = " + endTime);
+        log.info("Start time = " + Date.parse(dungeon.CustomData["StartTime"]));
+        log.info("Duration = " + dungeonData["Duration"]);
 
         if(currentTime > endTime){
             const GrantItemRequest = {

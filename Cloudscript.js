@@ -28,7 +28,8 @@ handlers.BeginDungeon = function (args) {
 };
 handlers.CompleteDungeon = function (args) {
     var currentTime = Date.now();
-    var inventory = server.GetUserInventory({ PlayFabId: currentPlayerId });
+    var catalog = server.GetCatalogItems({ CatalogVersion: "main" }).Catalog;
+    var inventory = server.GetUserInventory({ PlayFabId: currentPlayerId }).Inventory;
     var itemId;
     if (args && args.hasOwnProperty("ItemId")) {
         itemId = args["ItemId"];
@@ -39,16 +40,26 @@ handlers.CompleteDungeon = function (args) {
         log.info("We defaulted to FirstDungeon");
     }
     var dungeon = null;
-    inventory.Inventory.forEach(function (item, index, array) {
+    var rootItem = null;
+    inventory.forEach(function (item, index, array) {
         if (item.ItemId == itemId) {
             dungeon = item;
             return;
         }
     });
-    if (dungeon !== null) {
-        var endTime = Date.parse(dungeon.CustomData["StartTime"]) + Date.parse(dungeon.CustomData["Duration"]);
+    catalog.forEach(function (item, index, array) {
+        if (item.ItemId == itemId) {
+            rootItem = item;
+            return;
+        }
+    });
+    if (dungeon !== null && rootItem !== null) {
+        var dungeonData = JSON.parse(rootItem.CustomData);
+        var endTime = Date.parse(dungeon.CustomData["StartTime"]) + Number(dungeonData["Duration"]);
         log.info("Current time = " + currentTime);
         log.info("End time = " + endTime);
+        log.info("Start time = " + Date.parse(dungeon.CustomData["StartTime"]));
+        log.info("Duration = " + dungeonData["Duration"]);
         if (currentTime > endTime) {
             var GrantItemRequest = {
                 PlayFabId: currentPlayerId,
