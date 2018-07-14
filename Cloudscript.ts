@@ -33,14 +33,13 @@ handlers.BeginDungeon = function (args) {
 
     server.UpdateUserInventoryItemCustomData(modifyDataRequest);
 
-    return grantItemResult.ItemGrantResults[0];
+    //get the thing we just added to the inventory so we can get a copy of the modified data
+    return GetItemFromUserInventory(itemId);
 }
 
 handlers.CompleteDungeon = function (args) {
 
     let currentTime = Date.now();
-    let catalog = server.GetCatalogItems({CatalogVersion: "main"}).Catalog;
-    let inventory = server.GetUserInventory({PlayFabId: currentPlayerId}).Inventory;
     
     let itemId: string;
 
@@ -52,24 +51,9 @@ handlers.CompleteDungeon = function (args) {
         log.info("We defaulted to FirstDungeon");
     }
     
-    let dungeon: PlayFabServerModels.ItemInstance = null;
-    let rootItem: PlayFabServerModels.CatalogItem = null;
-
-    inventory.forEach(function(item, index, array){
-        if(item.ItemId == itemId){
-            dungeon = item;
-            return;
-        }
-    });
-
-    catalog.forEach(function(item, index, array){
-        if(item.ItemId == itemId){
-            rootItem = item;
-            return;
-        }
-    });
+    let dungeon: PlayFabServerModels.ItemInstance = GetItemFromUserInventory(itemId);
+    let rootItem: PlayFabServerModels.CatalogItem = GetItemFromCatalog("main", itemId);
     
-
     if(dungeon !== null && rootItem !== null){
 
         let dungeonData = JSON.parse(rootItem.CustomData);
@@ -130,4 +114,32 @@ function AddVC(vcBalances: {[key:string]: number}, code: string, amount: number)
 
     
     var AddUserVirtualCurrencyResult = server.AddUserVirtualCurrency(AddUserVirtualCurrencyRequest);
+}
+
+function GetItemFromCatalog(catalogVer:string, itemId:string)
+{
+    let tofind: PlayFabServerModels.CatalogItem = null;
+    let catalog = server.GetCatalogItems({CatalogVersion: catalogVer}).Catalog;
+
+    catalog.forEach(function(item, index, array){
+        if(item.ItemId == itemId){
+            tofind = item;
+            return;
+        }
+    });
+    return tofind;
+}
+
+function GetItemFromUserInventory(itemId:string)
+{
+    let tofind: PlayFabServerModels.ItemInstance = null;
+    let inventory = server.GetUserInventory({PlayFabId: currentPlayerId}).Inventory;
+
+    inventory.forEach(function(item, index, array){
+        if(item.ItemId == itemId){
+            tofind = item;
+            return;
+        }
+    });
+    return tofind;
 }

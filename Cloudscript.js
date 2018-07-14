@@ -24,12 +24,10 @@ handlers.BeginDungeon = function (args) {
         }
     };
     server.UpdateUserInventoryItemCustomData(modifyDataRequest);
-    return grantItemResult.ItemGrantResults[0];
+    return GetItemFromUserInventory(itemId);
 };
 handlers.CompleteDungeon = function (args) {
     var currentTime = Date.now();
-    var catalog = server.GetCatalogItems({ CatalogVersion: "main" }).Catalog;
-    var inventory = server.GetUserInventory({ PlayFabId: currentPlayerId }).Inventory;
     var itemId;
     if (args && args.hasOwnProperty("ItemId")) {
         itemId = args["ItemId"];
@@ -39,20 +37,8 @@ handlers.CompleteDungeon = function (args) {
         itemId = "FirstDungeon";
         log.info("We defaulted to FirstDungeon");
     }
-    var dungeon = null;
-    var rootItem = null;
-    inventory.forEach(function (item, index, array) {
-        if (item.ItemId == itemId) {
-            dungeon = item;
-            return;
-        }
-    });
-    catalog.forEach(function (item, index, array) {
-        if (item.ItemId == itemId) {
-            rootItem = item;
-            return;
-        }
-    });
+    var dungeon = GetItemFromUserInventory(itemId);
+    var rootItem = GetItemFromCatalog("main", itemId);
     if (dungeon !== null && rootItem !== null) {
         var dungeonData = JSON.parse(rootItem.CustomData);
         var endTime = Number(dungeon.CustomData["StartTime"]) + Number(dungeonData["Duration"]);
@@ -101,5 +87,27 @@ function AddVC(vcBalances, code, amount) {
         "Amount": amount
     };
     var AddUserVirtualCurrencyResult = server.AddUserVirtualCurrency(AddUserVirtualCurrencyRequest);
+}
+function GetItemFromCatalog(catalogVer, itemId) {
+    var tofind = null;
+    var catalog = server.GetCatalogItems({ CatalogVersion: catalogVer }).Catalog;
+    catalog.forEach(function (item, index, array) {
+        if (item.ItemId == itemId) {
+            tofind = item;
+            return;
+        }
+    });
+    return tofind;
+}
+function GetItemFromUserInventory(itemId) {
+    var tofind = null;
+    var inventory = server.GetUserInventory({ PlayFabId: currentPlayerId }).Inventory;
+    inventory.forEach(function (item, index, array) {
+        if (item.ItemId == itemId) {
+            tofind = item;
+            return;
+        }
+    });
+    return tofind;
 }
 //# sourceMappingURL=Cloudscript.js.map
