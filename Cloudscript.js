@@ -23,6 +23,7 @@ handlers.BeginDungeon = function (args) {
             "StartTime": currentTime.toString()
         }
     };
+    server.UpdateUserInventoryItemCustomData(modifyDataRequest);
     return grantItemResult.ItemGrantResults[0];
 };
 handlers.CompleteDungeon = function (args) {

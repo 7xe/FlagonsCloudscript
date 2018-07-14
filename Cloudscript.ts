@@ -32,6 +32,8 @@ handlers.BeginDungeon = function (args) {
         }
     }
 
+    server.UpdateUserInventoryItemCustomData(modifyDataRequest);
+
     return grantItemResult.ItemGrantResults[0];
 }
 
