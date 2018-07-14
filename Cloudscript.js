@@ -1,12 +1,21 @@
 var GOLD_CODE = "GP";
 handlers.BeginDungeon = function (args) {
     var currentTime = Date.now();
+    var itemId;
+    if (args && args.hasOwnProperty("ItemId")) {
+        itemId = args["ItemId"];
+        log.info("We used the argument passed to us " + itemId);
+    }
+    else {
+        itemId = "FirstDungeon";
+        log.info("We defaulted to FirstDungeon");
+    }
     var GrantItemRequest = {
         CatalogVersion: "main",
         ItemGrants: [
             {
                 PlayFabId: currentPlayerId,
-                ItemId: "FirstDungeon",
+                ItemId: itemId,
                 Data: {
                     "StartTime": currentTime.toString()
                 }
@@ -32,21 +41,25 @@ handlers.CompleteDungeon = function (args) {
     inventory.Inventory.forEach(function (item, index, array) {
         if (item.ItemId == itemId) {
             dungeon = item;
+            return;
         }
     });
     if (dungeon !== null) {
-        var GrantItemRequest = {
-            PlayFabId: currentPlayerId,
-            CatalogVersion: "main",
-            ItemIds: ["FirstDungeonDummyKey"]
-        };
-        server.GrantItemsToUser(GrantItemRequest);
-        var UnlockContainerRequest = {
-            PlayFabId: currentPlayerId,
-            CatalogVersion: "main",
-            ContainerItemId: dungeon.ItemId
-        };
-        server.UnlockContainerItem(UnlockContainerRequest);
+        var endTime = Date.parse(dungeon.CustomData["StartTime"]) + Date.parse(dungeon.CustomData["Duration"]);
+        if (currentTime > endTime) {
+            var GrantItemRequest = {
+                PlayFabId: currentPlayerId,
+                CatalogVersion: "main",
+                ItemIds: [dungeon.ItemId + "DummyKey"]
+            };
+            server.GrantItemsToUser(GrantItemRequest);
+            var UnlockContainerRequest = {
+                PlayFabId: currentPlayerId,
+                CatalogVersion: "main",
+                ContainerItemId: dungeon.ItemId
+            };
+            server.UnlockContainerItem(UnlockContainerRequest);
+        }
     }
 };
 handlers.GetMonies = function (args) {
